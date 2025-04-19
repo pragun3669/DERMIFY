@@ -7,8 +7,9 @@ __pycache__/
 *.pyc
 venv/
 
+
 # Frontend build
-frontend/build/
+
 backend/Model/
 backend/uploads
 backend/Model/best_vit1_model.pth
