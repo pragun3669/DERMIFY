@@ -1,0 +1,25 @@
+# Node.js
+node_modules/
+.env
+
+# Python
+__pycache__/
+*.pyc
+venv/
+
+# Frontend build
+frontend/build/
+backend/Model/
+backend/uploads
+backend/Model/best_vit1_model.pth
+backend/Model/skin_classifier.h5 
+# Logs
+*.log
+
+# User uploads and reports
+uploads/
+backend/static/reports/
+
+# OS specific
+.DS_Store
+Thumbs.db
