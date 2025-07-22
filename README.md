@@ -88,8 +88,6 @@ DERMIFY is a full-stack AI-powered web application designed for early detection 
 
 ## 📈 Model Evaluation
 
-> Replace below placeholders with your actual result images after uploading them to the `/images/` folder.
-
 ### 📊 Confusion Matrix
 
 <img width="1241" height="1154" alt="confusion matrix VIT" src="https://github.com/user-attachments/assets/bcbe6e2e-1249-4d48-9854-3d121c831c8c" />
