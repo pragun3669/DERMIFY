@@ -81,7 +81,6 @@ DERMIFY is a full-stack AI-powered web application designed for early detection 
 ## 📤 Image Input Methods
 
 - Upload an image manually from your device
-- OR
 - Capture a real-time image using your **smartphone camera via IP Webcam** (e.g., DroidCam or IP Webcam app)
 
 ---
