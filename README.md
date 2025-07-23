@@ -1,4 +1,4 @@
-# 🧠 DERMIFY: Skin Disease Detection & Diagnosis Platform
+#  DERMIFY: Skin Disease Detection & Diagnosis Platform
 
 DERMIFY is a full-stack AI-powered web application designed for early detection and classification of skin diseases using deep learning. The platform enables users to either upload an image or capture one in real-time using their phone camera via an IP Webcam. It then predicts the skin condition using trained ML models and generates a personalized report containing disease details, precautions, and treatment suggestions.
 
