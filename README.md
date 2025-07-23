@@ -108,7 +108,7 @@ DERMIFY is a full-stack AI-powered web application designed for early detection 
 
 > Click below to view/download a demo of the generated medical report:
 
-📎 [View Sample Report (PDF)][Eczema_Photos_Report (2).pdf](https://github.com/user-attachments/files/21366197/Eczema_Photos_Report.2.pdf)
+📎 [Eczema_Photos_Report (2).pdf](https://github.com/user-attachments/files/21366197/Eczema_Photos_Report.2.pdf)
 
 
 ---
