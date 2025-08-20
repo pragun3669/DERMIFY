@@ -44,14 +44,6 @@ DERMIFY is a full-stack AI-powered web application designed for early detection 
 - Trained on 23-class skin disease dataset
 - Validation split done using **Stratified K-Fold**
 - Handles global context well for skin textures
-
-**Performance:**
-| Metric              | Accuracy    |
-|---------------------|-------------|
-| Train Accuracy      | 97.55%      |
-| Validation Accuracy | 64.23%      |
-| Test Accuracy       | 65.59%      |
-
 ---
 
 ### 2. EfficientNet-B2
@@ -59,14 +51,6 @@ DERMIFY is a full-stack AI-powered web application designed for early detection 
 - Pretrained on ImageNet, fine-tuned on skin disease dataset
 - Validation split done using **Stratified Group K-Fold**
 - Optimized for speed and resource usage
-
-**Performance:**
-| Metric              | Accuracy |
-|---------------------|----------|
-| Train Accuracy      | 94.56%   |
-| Validation Accuracy | 60.78%   |
-| Test Accuracy       | 63.85%   |
-
 ---
 
 ## 📂 Dataset
