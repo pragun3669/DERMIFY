@@ -76,7 +76,7 @@ function UploadImage() {
         formData.append("patientName", user.username);
         formData.append("email", user.email);
 
-        axios.post(`${process.env.ML_API_URL}/predict`, formData, {
+        axios.post(`${process.env.REACT_APP_API_URL}/api/predict` , formData, {
             headers: { "Content-Type": "multipart/form-data" }
         })
         .then((response) => {
