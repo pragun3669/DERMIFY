@@ -7,6 +7,7 @@ from flask_cors import CORS
 from torchvision import transforms
 from PIL import Image
 from transformers import ViTForImageClassification
+from huggingface_hub import hf_hub_download
 from werkzeug.utils import secure_filename
 from pymongo import MongoClient
 
@@ -58,15 +59,26 @@ disease_labels = [
 ]
 
 # =====================
-# Load Model from Hugging Face
+# Load Model from Hugging Face (.pth correctly)
 # =====================
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
+# Download weights
+model_path = hf_hub_download(
+    repo_id="pragun3669/dermify-vit",
+    filename="best_vit1_model.pth"
+)
+
+# Load base architecture
 model = ViTForImageClassification.from_pretrained(
-    "pragun3669/dermify-vit",
+    "google/vit-large-patch16-224",
     num_labels=len(disease_labels),
     ignore_mismatched_sizes=True
 )
+
+# Load trained weights
+state_dict = torch.load(model_path, map_location=device)
+model.load_state_dict(state_dict)
 
 model.to(device)
 model.eval()
@@ -136,13 +148,9 @@ def predict():
 @app.route("/reports", methods=["GET"])
 def get_reports():
     email = request.args.get("email")
-    reports = list(
-        reports_collection.find({"email": email}).sort("createdAt", -1)
-    )
-
+    reports = list(reports_collection.find({"email": email}).sort("createdAt", -1))
     for r in reports:
         r["_id"] = str(r["_id"])
-
     return jsonify(reports)
 
 # =====================
