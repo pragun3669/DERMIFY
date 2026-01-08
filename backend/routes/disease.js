@@ -3,10 +3,14 @@ const Disease = require("../models/Disease");
 const PDFDocument = require("pdfkit");
 const path = require("path");
 const fs = require("fs");
+const axios = require("axios");
+const FormData = require("form-data");
 
 const router = express.Router();
 
-// Fetch disease info from database
+/* =========================================================
+   FETCH DISEASE INFO
+========================================================= */
 router.get("/disease-info/:diseaseName", async (req, res) => {
   try {
     const diseaseName = req.params.diseaseName;
@@ -23,9 +27,46 @@ router.get("/disease-info/:diseaseName", async (req, res) => {
   }
 });
 
-// Generate PDF Report with Image + Diet
+/* =========================================================
+   ML PREDICTION (NODE → FLASK → HF SPACES)
+========================================================= */
+router.post("/predict", async (req, res) => {
+  try {
+    if (!req.files || !req.files.file) {
+      return res.status(400).json({ message: "No image file provided" });
+    }
+
+    const image = req.files.file;
+    const { patientName, email } = req.body;
+
+    const formData = new FormData();
+    formData.append("file", image.data, image.name);
+    formData.append("patientName", patientName || "Unknown");
+    formData.append("email", email || "Unknown");
+
+    const mlResponse = await axios.post(
+      `${process.env.ML_API_URL}/predict`,
+      formData,
+      {
+        headers: formData.getHeaders(),
+        timeout: 120000, // HF Spaces cold start safe
+      }
+    );
+
+    return res.json(mlResponse.data);
+
+  } catch (error) {
+    console.error("❌ ML Prediction Error:", error.message);
+    return res.status(500).json({ message: "error while trying to predict" });
+  }
+});
+
+/* =========================================================
+   GENERATE PDF REPORT
+========================================================= */
 router.post("/generate-pdf", async (req, res) => {
   console.log("📥 PDF generation request hit the route");
+
   try {
     const { username, predicted_disease } = req.body;
 
@@ -52,9 +93,9 @@ router.post("/generate-pdf", async (req, res) => {
     doc.pipe(res);
 
     // Header
-    doc.fontSize(20).fillColor("black").font("Helvetica-Bold").text("DERMIFY", { align: "center" });
+    doc.fontSize(20).font("Helvetica-Bold").text("DERMIFY", { align: "center" });
     doc.moveDown(0.3);
-    doc.lineWidth(0.5).moveTo(40, doc.y).lineTo(550, doc.y).stroke();
+    doc.moveTo(40, doc.y).lineTo(550, doc.y).stroke();
     doc.moveDown(0.3);
 
     // Patient Info
@@ -63,10 +104,10 @@ router.post("/generate-pdf", async (req, res) => {
     doc.text(`Role: Patient`);
     doc.text(`Date/Time: ${dateTime}`, { align: "right" });
     doc.moveDown(0.2);
-    doc.lineWidth(0.5).moveTo(40, doc.y).lineTo(550, doc.y).stroke();
+    doc.moveTo(40, doc.y).lineTo(550, doc.y).stroke();
     doc.moveDown(0.3);
 
-    // Report Title
+    // Title
     doc.fontSize(14).font("Times-Bold").text("Skin Prediction Report", {
       align: "center",
       underline: true,
@@ -78,57 +119,49 @@ router.post("/generate-pdf", async (req, res) => {
     doc.moveDown(0.3);
 
     doc.text("Description:", { underline: true });
-    doc.text(description, { lineGap: 1 });
+    doc.text(description);
     doc.moveDown(0.3);
 
     doc.text("Prevention:", { underline: true });
     prevention.forEach((step, index) => {
-      doc.text(`${index + 1}. ${step}`, { lineGap: 0.5 });
+      doc.text(`${index + 1}. ${step}`);
     });
     doc.moveDown(0.3);
 
     doc.text("Treatment:", { underline: true });
     treatment.forEach((step, index) => {
-      doc.text(`${index + 1}. ${step}`, { lineGap: 0.5 });
+      doc.text(`${index + 1}. ${step}`);
     });
     doc.moveDown(0.3);
 
     if (diet && diet.length > 0) {
       doc.text("Recommended Diet:", { underline: true });
       diet.forEach((item, index) => {
-        doc.text(`${index + 1}. ${item}`, { lineGap: 0.5 });
+        doc.text(`${index + 1}. ${item}`);
       });
       doc.moveDown(0.3);
     }
 
-    // Limit number of images and size
+    // Images
     if (image && image.length > 0) {
       doc.text("Sample Images:", { underline: true });
       doc.moveDown(0.2);
 
       let startX = 40;
       let startY = doc.y;
-      const imageWidth = 100;
-      const imageHeight = 100;
+      const imgW = 100;
+      const imgH = 100;
       const gap = 10;
-      const maxImages = 3;
 
-      image.slice(0, maxImages).forEach((imgPath, index) => {
+      image.slice(0, 3).forEach((imgPath) => {
         const absolutePath = path.join(__dirname, "..", imgPath);
         if (fs.existsSync(absolutePath)) {
-          if (startX + imageWidth > 550) {
-            startX = 40;
-            startY += imageHeight + gap;
-          }
-          doc.image(absolutePath, startX, startY, { width: imageWidth, height: imageHeight });
-          startX += imageWidth + gap;
-        } else {
-          doc.fontSize(9).text(`Image ${index + 1} not found.`, startX, startY);
-          startX += imageWidth + gap;
+          doc.image(absolutePath, startX, startY, { width: imgW, height: imgH });
+          startX += imgW + gap;
         }
       });
 
-      doc.y = startY + imageHeight + gap;
+      doc.y = startY + imgH + gap;
     }
 
     // Disclaimer
