@@ -1,12 +1,12 @@
 const express = require("express");
-const Disease = require("../models/Disease"); // Disease Model
+const Disease = require("../models/Disease");
 const PDFDocument = require("pdfkit");
-const fs = require("fs");
 const path = require("path");
+const fs = require("fs");
 
 const router = express.Router();
 
-// ✅ Fetch disease information from the database
+// Fetch disease info from database
 router.get("/disease-info/:diseaseName", async (req, res) => {
   try {
     const diseaseName = req.params.diseaseName;
@@ -23,72 +23,126 @@ router.get("/disease-info/:diseaseName", async (req, res) => {
   }
 });
 
+// Generate PDF Report with Image + Diet
 router.post("/generate-pdf", async (req, res) => {
+  console.log("📥 PDF generation request hit the route");
   try {
-      const { body_part, symptoms, predicted_disease, username } = req.body;
+    const { username, predicted_disease } = req.body;
 
-      if (!body_part || !symptoms || !predicted_disease || !username) {
-          return res.status(400).json({ message: "Missing required fields" });
-      }
+    if (!username || !predicted_disease) {
+      return res.status(400).json({ message: "Missing required fields" });
+    }
 
-      const diseaseInfo = await Disease.findOne({ name: predicted_disease });
+    const diseaseInfo = await Disease.findOne({ name: predicted_disease });
 
-      if (!diseaseInfo) {
-          return res.status(404).json({ message: "Disease not found in database" });
-      }
+    if (!diseaseInfo) {
+      return res.status(404).json({ message: "Disease not found in database" });
+    }
 
-      const { name, description, prevention, treatment } = diseaseInfo;
+    const { name, description, prevention, treatment, diet, image } = diseaseInfo;
 
-      const doc = new PDFDocument({ margin: 50 });
-      res.setHeader("Content-Type", "application/pdf");
-      res.setHeader("Content-Disposition", `attachment; filename=${name.replace(/\s+/g, "_")}_Report.pdf`);
+    const doc = new PDFDocument({ margin: 40 });
 
-      doc.pipe(res);
+    res.setHeader("Content-Type", "application/pdf");
+    res.setHeader(
+      "Content-Disposition",
+      `attachment; filename=${name.replace(/\s+/g, "_")}_Report.pdf`
+    );
 
-      // Title with Green "DERMIFY" and Bold
-      doc.fontSize(24).fillColor("black").font('Helvetica-Bold').text("DERMIFY", { align: "center" });
-      doc.moveDown(0.5);
-      
-      // Horizontal line
-      doc.moveDown(0.25).lineWidth(1).moveTo(50, doc.y).lineTo(550, doc.y).stroke();
-      doc.moveDown(0.5);
+    doc.pipe(res);
 
-      // Patient Details (Username, Role, Date/Time)
-      const dateTime = new Date().toLocaleString();
-      doc.fontSize(12).font('Times-Roman').text(`Patient Name: ${username}`, { align: "left" });
-      doc.text(`Role: Patient`, { align: "left" });
-      doc.text(`Date/Time: ${dateTime}`, { align: "right", bold: true });
+    // Header
+    doc.fontSize(20).fillColor("black").font("Helvetica-Bold").text("DERMIFY", { align: "center" });
+    doc.moveDown(0.3);
+    doc.lineWidth(0.5).moveTo(40, doc.y).lineTo(550, doc.y).stroke();
+    doc.moveDown(0.3);
 
-      // Horizontal line again
-      doc.moveDown(0.5).lineWidth(1).moveTo(50, doc.y).lineTo(550, doc.y).stroke();
-      doc.moveDown(0.5);
+    // Patient Info
+    const dateTime = new Date().toLocaleString();
+    doc.fontSize(10).font("Times-Roman").text(`Patient Name: ${username}`);
+    doc.text(`Role: Patient`);
+    doc.text(`Date/Time: ${dateTime}`, { align: "right" });
+    doc.moveDown(0.2);
+    doc.lineWidth(0.5).moveTo(40, doc.y).lineTo(550, doc.y).stroke();
+    doc.moveDown(0.3);
 
-      // Skin Prediction Report
-      doc.fontSize(18).font('Times-Roman').text("Skin Prediction Report", { align: "center", underline: true }).moveDown();
+    // Report Title
+    doc.fontSize(14).font("Times-Bold").text("Skin Prediction Report", {
+      align: "center",
+      underline: true,
+    });
+    doc.moveDown(0.4);
 
-      // Disease Information
-      doc.fontSize(14).font('Times-Roman').text(`Disease Name: ${name}`).moveDown();
-      doc.fontSize(12).font('Times-Roman').text(`Affected Body Part: ${body_part}`).moveDown();
-      doc.fontSize(12).font('Times-Roman').text(`Selected Symptoms: ${symptoms.join(", ")}`).moveDown();
+    // Disease Info
+    doc.fontSize(14).font("Times-Roman").text(`Disease Name: ${name}`);
+    doc.moveDown(0.3);
 
-      doc.fontSize(12).font('Times-Roman').text("Description:", { underline: true }).text(description).moveDown();
+    doc.text("Description:", { underline: true });
+    doc.text(description, { lineGap: 1 });
+    doc.moveDown(0.3);
 
-      doc.fontSize(12).font('Times-Roman').text("Prevention:", { underline: true });
-      prevention.forEach((step, index) => doc.text(`${index + 1}. ${step}`));
-      doc.moveDown();
+    doc.text("Prevention:", { underline: true });
+    prevention.forEach((step, index) => {
+      doc.text(`${index + 1}. ${step}`, { lineGap: 0.5 });
+    });
+    doc.moveDown(0.3);
 
-      doc.fontSize(12).font('Times-Roman').text("Treatment:", { underline: true });
-      treatment.forEach((step, index) => doc.text(`${index + 1}. ${step}`));
-      doc.moveDown();
+    doc.text("Treatment:", { underline: true });
+    treatment.forEach((step, index) => {
+      doc.text(`${index + 1}. ${step}`, { lineGap: 0.5 });
+    });
+    doc.moveDown(0.3);
 
-      // Disclaimer
-      doc.moveDown();
-      doc.fontSize(12).font('Helvetica').text("**This information is not accurate. If serious, kindly visit a doctor.**", { align: "center" });
+    if (diet && diet.length > 0) {
+      doc.text("Recommended Diet:", { underline: true });
+      diet.forEach((item, index) => {
+        doc.text(`${index + 1}. ${item}`, { lineGap: 0.5 });
+      });
+      doc.moveDown(0.3);
+    }
 
-      doc.end();
+    // Limit number of images and size
+    if (image && image.length > 0) {
+      doc.text("Sample Images:", { underline: true });
+      doc.moveDown(0.2);
+
+      let startX = 40;
+      let startY = doc.y;
+      const imageWidth = 100;
+      const imageHeight = 100;
+      const gap = 10;
+      const maxImages = 3;
+
+      image.slice(0, maxImages).forEach((imgPath, index) => {
+        const absolutePath = path.join(__dirname, "..", imgPath);
+        if (fs.existsSync(absolutePath)) {
+          if (startX + imageWidth > 550) {
+            startX = 40;
+            startY += imageHeight + gap;
+          }
+          doc.image(absolutePath, startX, startY, { width: imageWidth, height: imageHeight });
+          startX += imageWidth + gap;
+        } else {
+          doc.fontSize(9).text(`Image ${index + 1} not found.`, startX, startY);
+          startX += imageWidth + gap;
+        }
+      });
+
+      doc.y = startY + imageHeight + gap;
+    }
+
+    // Disclaimer
+    doc.moveDown(0.3);
+    doc.fontSize(9).font("Helvetica-Oblique").fillColor("green").text(
+      "**This information is not accurate. If serious, kindly visit a doctor.**",
+      { align: "center" }
+    );
+
+    doc.end();
+
   } catch (error) {
-      console.error("Error generating PDF:", error);
-      res.status(500).json({ message: "Failed to generate PDF" });
+    console.error("Error generating PDF:", error);
+    res.status(500).json({ message: "Failed to generate PDF" });
   }
 });
 

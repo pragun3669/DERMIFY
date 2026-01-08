@@ -3,35 +3,38 @@ const connectDB = require("./config/db");
 const authRoutes = require("./routes/authRoutes");
 const diseaseRoutes = require("./routes/disease");
 const cors = require("cors");
-const fs = require("fs");
 const path = require("path");
-const session = require("express-session"); // ✅ Added for session support
+const session = require("express-session");
 require("dotenv").config();
-const reportRoutes = require("./routes/report");
-
 
 const app = express();
 
-// ✅ Allow credentials for session-based authentication
+// ✅ CORS (deployment-safe)
 app.use(cors({
-  origin: "http://localhost:3000", // Your frontend URL
-  credentials: true, // Allow cookies
+  origin: true,
+  credentials: true,
 }));
 
 app.use(express.json());
 
-// ✅ Session middleware (Only needed if using sessions)
+// ✅ Sessions
 app.use(session({
-  secret: process.env.SESSION_SECRET || "your_secret_key", 
+  name: "dermify.sid",
+  secret: process.env.SESSION_SECRET,
   resave: false,
   saveUninitialized: false,
-  cookie: { secure: false } // Change to `true` if using HTTPS
+  cookie: {
+    secure: process.env.NODE_ENV === "production",
+    httpOnly: true,
+    sameSite: process.env.NODE_ENV === "production" ? "none" : "lax"
+  }
 }));
 
 connectDB();
+
 app.use("/images", express.static(path.join(__dirname, "public/images")));
 app.use("/api", authRoutes);
 app.use("/api", diseaseRoutes);
-app.use("/reports", reportRoutes);
+
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log(`🚀 Server running on port ${PORT}`));
