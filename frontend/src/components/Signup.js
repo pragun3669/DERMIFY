@@ -16,7 +16,7 @@ const Signup = () => {
     setError(""); // Clear previous errors
 
     try {
-      const response = await axios.post('http://localhost:5000/api/signup', {
+      const response = await axios.post(  `${process.env.REACT_APP_API_URL}/api/signup`, {
         name,
         email,
         password,

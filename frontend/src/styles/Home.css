@@ -76,7 +76,9 @@ body {
 }
 
 .feature-cards {
-  display: grid;
+  
+  display: flex;
+  justify-content: center; /* Center cards horizontally */
   grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
   gap: 30px;
   padding: 0 20px;
@@ -161,5 +163,97 @@ body {
 
   .feature-cards {
     grid-template-columns: 1fr;
+  }
+}/* Footer Styling */
+.footer {
+  margin-top: 50px; /* Ensures it appears at the end */
+  background-color: #34b89b; /* Green background */
+  color: #333; /* Dark text */
+  text-align: center;
+  padding: 30px 20px;
+  border-top: 2px solid rgb(21, 20, 20); /* Optional border to separate footer from content */
+  font-family: 'Arial', sans-serif; /* Change to a modern sans-serif font */
+}
+
+.footer-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start; /* Align items to the top of the container */
+  gap: 40px;
+}
+
+.footer-team {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  text-align: left; /* Align the text to the left */
+  font-size: 18px; /* Change the font size for the team names */
+  font-weight: bold; /* Make team members' names bold */
+  color: #222; /* Darker text color */
+}
+
+.footer-team li {
+  margin: 10px 0;
+  font-weight: bold;
+}
+
+.footer-description {
+  flex-grow: 1; /* Ensures it takes available space */
+  text-align: left;
+  width: 50%; /* Half of the footer */
+  font-size: 16px; /* Font size for the paragraph */
+  color: #333; /* Text color for the description */
+  line-height: 1.6; /* Add line-height for readability */
+  font-family: 'Georgia', serif; /* Use a serif font for paragraph text */
+}
+
+.footer-links {
+  display: flex;
+  justify-content: center;
+  gap: 30px;
+  margin-top: 10px;
+}
+
+.footer-link {
+  color: #333;
+  text-decoration: none;
+  font-size: 16px;
+  font-weight: bold;
+}
+
+.footer-link:hover {
+  text-decoration: underline;
+}
+
+/* Animated Card Styling */
+.card-link {
+  text-decoration: none;
+}
+
+.animated-card {
+  padding: 20px;
+  background: #f4f4f4;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s ease;
+}
+
+.animated-card:hover {
+  transform: scale(1.05);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+}
+
+.animated-title,
+.animated-text {
+  font-family: "Arial", sans-serif;
+  animation: fadeIn 1.5s ease-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
   }
 }

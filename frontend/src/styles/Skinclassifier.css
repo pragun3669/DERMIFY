@@ -1,0 +1,152 @@
+/* General Container */
+.container {
+  text-align: center;
+  padding: 20px;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background-color: #f9f9f9;
+}
+.webcam-video {
+  filter: brightness(1.1) contrast(1.2) saturate(1.0) hue-rotate(0deg);
+}
+
+/* Header Styles */
+.header {
+  font-size: 32px;
+  font-weight: bold;
+  margin-bottom: 20px;
+  color: #2f855a;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+}
+
+/* User Info */
+.user-info {
+  margin-bottom: 15px;
+  font-size: 18px;
+  color: #555;
+}
+
+/* Button Group */
+.button-group {
+  margin-bottom: 20px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 15px;
+  justify-content: center;
+}
+
+/* Green Button Styles */
+.green-button {
+  background: linear-gradient(90deg, #32de84 0%, #28a745 100%);
+  color: #fff;
+  padding: 12px 24px;
+  border: none;
+  border-radius: 12px;
+  font-weight: 600;
+  font-size: 16px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 8px 20px rgba(50, 222, 132, 0.3);
+  outline: none;
+}
+
+.green-button:hover {
+  background: linear-gradient(90deg, #28a745 0%, #32de84 100%);
+  transform: translateY(-3px) scale(1.05);
+  box-shadow: 0 12px 30px rgba(50, 222, 132, 0.4);
+}
+
+.green-button:active {
+  transform: translateY(1px) scale(0.98);
+  box-shadow: 0 5px 15px rgba(50, 222, 132, 0.25);
+}
+
+.green-button:disabled {
+  background: #ccc;
+  color: #666;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+/* Image Preview */
+.preview-image {
+  width: 100%;
+  max-width: 500px;
+  border-radius: 15px;
+  margin-top: 15px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+/* Camera Video */
+.camera-video {
+  width: 100%;
+  max-width: 600px;
+  border-radius: 15px;
+  margin-bottom: 20px;
+  border: 2px solid #ccc;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+}
+
+/* Progress Bar Container */
+.progress-bar-container {
+  width: 90%;
+  max-width: 400px;
+  background-color: #e0e0e0;
+  border-radius: 25px;
+  overflow: hidden;
+  margin: 20px auto;
+}
+
+/* The progress bar itself */
+.progress-bar {
+  height: 20px;
+  border-radius: 25px;
+  color: white;
+  text-align: center;
+  line-height: 20px;
+  font-weight: bold;
+  transition: width 0.5s ease;
+  font-size: 14px;
+}
+
+/* Dynamic Colors for Confidence Levels */
+.progress-bar.green {
+  background-color: #4caf50; /* High confidence */
+}
+
+.progress-bar.yellow {
+  background-color: #ffeb3b; /* Medium confidence */
+  color: #333;
+}
+
+.progress-bar.red {
+  background-color: #f44336; /* Low confidence */
+}
+
+/* Result Text */
+.result-text {
+  font-size: 20px;
+  font-weight: bold;
+  color: #2f855a;
+  margin-top: 20px;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
+}
+
+/* Responsive Styling */
+@media (max-width: 600px) {
+  .green-button {
+    width: 100%;
+    margin-bottom: 10px;
+    font-size: 14px;
+    padding: 10px 20px;
+  }
+
+  .camera-video,
+  .preview-image {
+    max-width: 100%;
+  }
+
+  .progress-bar-container {
+    width: 100%;
+  }
+}
