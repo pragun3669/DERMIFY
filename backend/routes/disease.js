@@ -32,11 +32,11 @@ router.get("/disease-info/:diseaseName", async (req, res) => {
 ========================================================= */
 router.post("/predict", async (req, res) => {
   try {
-    if (!req.files || !req.files.file) {
+    if (!req.files || Object.keys(req.files).length === 0) {
       return res.status(400).json({ message: "No image file provided" });
     }
 
-    const image = req.files.file;
+    const image = req.files.file || req.files[Object.keys(req.files)[0]];
     const { patientName, email } = req.body;
 
     const formData = new FormData();
@@ -49,14 +49,14 @@ router.post("/predict", async (req, res) => {
       formData,
       {
         headers: formData.getHeaders(),
-        timeout: 120000, // HF Spaces cold start safe
+        timeout: 120000,
       }
     );
 
     return res.json(mlResponse.data);
 
   } catch (error) {
-    console.error("❌ ML Prediction Error:", error.message);
+    console.error("❌ ML Prediction Error:", error);
     return res.status(500).json({ message: "error while trying to predict" });
   }
 });
