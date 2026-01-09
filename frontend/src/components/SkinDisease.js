@@ -76,7 +76,7 @@ function SkinDisease() {
 
         try {
             const storedUser = JSON.parse(localStorage.getItem("user"));
-            const username = storedUser?.name || "Anonymous";
+            const username = storedUser?.username || "Anonymous";
 
             const pdfResponse = await axios.post(
                 `${process.env.REACT_APP_API_URL}/api/generate-pdf`,
