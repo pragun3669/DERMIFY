@@ -35,7 +35,6 @@ const Navbar = () => {
       </div>
       <div className="nav-links">
       <Link to="/">Home</Link>
-      <Link to="/upload">Live Camera detection</Link>
                <Link to="/disease">SkinDisease</Link>
         {user ? (
           <>
