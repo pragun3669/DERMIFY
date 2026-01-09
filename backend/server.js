@@ -37,9 +37,16 @@ app.use(session({
 }));
 
 connectDB();
+// 🔹 Static images
+app.use("/images", express.static(path.join(__dirname, "public/images")));
 
+// 🔹 ROUTES (THIS FIXES YOUR ISSUE)
 app.use("/api", authRoutes);
 app.use("/api", diseaseRoutes);
 
+// 🔹 Health check (OPTIONAL BUT RECOMMENDED)
+app.get("/health", (req, res) => {
+  res.json({ status: "Backend OK" });
+});
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log(`🚀 Server running on port ${PORT}`));
