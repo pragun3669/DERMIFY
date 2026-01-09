@@ -52,9 +52,12 @@ function SkinDisease() {
         formData.append("email", user.email);
 
         try {
-            const response = await axios.post(`${process.env.REACT_APP_API_URL}/api/predict`, formData, {
-                headers: { "Content-Type": "multipart/form-data" }
-            });
+            const response = await axios.post(
+                `${process.env.REACT_APP_API_URL}/api/predict`,
+                formData,
+                { headers: { "Content-Type": "multipart/form-data" } }
+              );
+              
 
             setPredictedDisease(response.data.prediction);
             setConfidence(response.data.confidence);

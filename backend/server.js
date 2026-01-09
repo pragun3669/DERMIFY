@@ -5,14 +5,20 @@ const diseaseRoutes = require("./routes/disease");
 const cors = require("cors");
 const path = require("path");
 const session = require("express-session");
+const fileUpload = require("express-fileupload");
 require("dotenv").config();
 
 const app = express();
 
-// ✅ CORS (deployment-safe)
+// ✅ CORS
 app.use(cors({
   origin: true,
   credentials: true,
+}));
+
+// 🔥 IMPORTANT: fileUpload BEFORE express.json
+app.use(fileUpload({
+  limits: { fileSize: 10 * 1024 * 1024 }, // 10MB
 }));
 
 app.use(express.json());
@@ -32,7 +38,6 @@ app.use(session({
 
 connectDB();
 
-app.use("/images", express.static(path.join(__dirname, "public/images")));
 app.use("/api", authRoutes);
 app.use("/api", diseaseRoutes);
 
