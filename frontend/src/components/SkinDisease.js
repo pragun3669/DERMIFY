@@ -93,23 +93,22 @@ function SkinDisease() {
       return;
     }
 
-    if (!user.username) {
-      alert("User not found. Please login again.");
-      return;
-    }
-
     setPdfLoading(true);
 
     try {
-      const pdfResponse = await axios.post(
-        `${process.env.REACT_APP_API_URL}/api/generate-pdf`,
-        {
-          username: user.username,          // ✅ FIXED
-          predicted_disease: predictedDisease
-        },
-        { responseType: "blob" }
-      );
-
+        const storedUser = JSON.parse(localStorage.getItem("user"));
+    
+        const username = storedUser?.name || "Anonymous";
+    
+        const pdfResponse = await axios.post(
+          `${process.env.REACT_APP_API_URL}/api/generate-pdf`,
+          {
+            username, // ✅ CORRECT KEY
+            predicted_disease: predictedDisease
+          },
+          { responseType: "blob" }
+        );
+        
       const blob = new Blob([pdfResponse.data], { type: "application/pdf" });
       const url = window.URL.createObjectURL(blob);
       const a = document.createElement("a");
