@@ -68,10 +68,15 @@ router.post("/generate-pdf", async (req, res) => {
   console.log("📥 PDF generation request hit the route");
 
   try {
-    const { username, predicted_disease } = req.body;
+    let { username, predicted_disease } = req.body;
 
-    if (!username || !predicted_disease) {
-      return res.status(400).json({ message: "Missing required fields" });
+    const safeUsername =
+      typeof username === "string" && username.trim().length > 0
+        ? username.trim()
+        : "Anonymous Patient";
+
+    if (!predicted_disease) {
+      return res.status(400).json({ message: "Predicted disease missing" });
     }
 
     const diseaseInfo = await Disease.findOne({ name: predicted_disease });
@@ -100,7 +105,7 @@ router.post("/generate-pdf", async (req, res) => {
 
     // Patient Info
     const dateTime = new Date().toLocaleString();
-    doc.fontSize(10).font("Times-Roman").text(`Patient Name: ${username}`);
+    doc.fontSize(10).font("Times-Roman").text(`Patient Name: ${safeUsername}`);
     doc.text(`Role: Patient`);
     doc.text(`Date/Time: ${dateTime}`, { align: "right" });
     doc.moveDown(0.2);
@@ -134,7 +139,7 @@ router.post("/generate-pdf", async (req, res) => {
     });
     doc.moveDown(0.3);
 
-    if (diet && diet.length > 0) {
+    if (diet?.length) {
       doc.text("Recommended Diet:", { underline: true });
       diet.forEach((item, index) => {
         doc.text(`${index + 1}. ${item}`);
@@ -143,25 +148,22 @@ router.post("/generate-pdf", async (req, res) => {
     }
 
     // Images
-    if (image && image.length > 0) {
+    if (image?.length) {
       doc.text("Sample Images:", { underline: true });
       doc.moveDown(0.2);
 
       let startX = 40;
       let startY = doc.y;
-      const imgW = 100;
-      const imgH = 100;
-      const gap = 10;
 
       image.slice(0, 3).forEach((imgPath) => {
         const absolutePath = path.join(__dirname, "..", imgPath);
         if (fs.existsSync(absolutePath)) {
-          doc.image(absolutePath, startX, startY, { width: imgW, height: imgH });
-          startX += imgW + gap;
+          doc.image(absolutePath, startX, startY, { width: 100, height: 100 });
+          startX += 110;
         }
       });
 
-      doc.y = startY + imgH + gap;
+      doc.y = startY + 110;
     }
 
     // Disclaimer
